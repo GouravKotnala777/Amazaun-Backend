@@ -30,7 +30,10 @@ export const stripe = new Stripe(STRIPE_KEY);
 const app = express();
 
 app.use(cors({
-    origin: 'http://127.0.0.1:5173',
+    origin:[
+        'http://127.0.0.1:5173',
+        'https://amazaun-frontend-12313.vercel.app'
+    ],
     credentials: true
 }));
 
