@@ -45,6 +45,9 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use("/api/v1/order", orderRoute);
+app.get("/api/v1/test", (req, res) => {
+    res.status(200).json({success:true, message:"API is working"})
+})
 
 app.use(errorMiddleware);
 

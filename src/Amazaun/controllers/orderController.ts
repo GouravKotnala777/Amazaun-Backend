@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from "../middlewares/auth";
 
 export const getAllOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const orders = await Order.find();
+        const orders = await Order.find().populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});;
 
         if (!orders) return next(new ErrorHandler("No order exists", 400));
 
@@ -18,7 +18,7 @@ export const getAllOrders = async(req:Request, res:Response, next:NextFunction) 
 };
 export const createOrder = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const userID = (req as AuthenticatedRequest)?.user?._id||"66043e12d63a8badf24a9962";
+        const userID = (req as AuthenticatedRequest)?.user?._id;
         const {quantity, productID, status, message} = req.body;
 
         const isUserOrderExists = await Order.findOne({user:userID});
@@ -62,7 +62,7 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
 };
 export const getMyOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const order = await Order.findOne({user:(req as AuthenticatedRequest).user._id});
+        const order = await Order.findOne({user:(req as AuthenticatedRequest).user._id}).populate({model:"Product", path:"orderItems.product", select:"name price photo"});
 
         if (!order) return next(new ErrorHandler("Order not found", 404));
 
