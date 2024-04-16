@@ -22,6 +22,15 @@ export interface UserDocument extends Document {
     reviewedProducts?: Types.ObjectId[];
     address?: Address;
     refreshToken:string;
+
+
+    isVarified?:boolean;
+    forgetPasswordToken?:string;
+    forgetPasswordTokenExpiry?:Date;
+    verifyToken?:string;
+    verifyTokenExpiry?:Date;
+
+
     isPasswordCorrect(password:string):Promise<boolean>;
     generateAccessToken():string;
     generateRefreshToken():string;
@@ -65,6 +74,17 @@ const userSchema = new mongoose.Schema<UserDocument>({
     refreshToken:{
         type:String
     },
+
+
+
+    isVarified:{type:Boolean, default:false},
+    forgetPasswordToken:String,
+    forgetPasswordTokenExpiry:Date,
+    verifyToken:String,
+    verifyTokenExpiry:Date,
+
+
+
     wishlistedProducts:[{
         type:mongoose.Schema.Types.ObjectId
     }],
