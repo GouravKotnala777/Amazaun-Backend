@@ -16,14 +16,8 @@ export const isUserAuthenticated = async(req:Request, res:Response, next:NextFun
         
         if (!token) return next(new ErrorHandler("Unauthorized request", 401));
         
-        console.log("--------- (1)");
-        
         const verifiedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as Secret) as JwtPayload;
-        console.log("--------- (2)");
-        
-        console.log({aaa:verifiedToken});
-        console.log("--------- (3)");
-        
+                
         if (!verifiedToken) return next(new ErrorHandler("no verifiedToken from auth.ts", 401));
     
         const user = await User.findById(verifiedToken._id).select("-password -refreshToken");

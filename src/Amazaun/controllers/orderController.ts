@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from "../middlewares/auth";
 
 export const getAllOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const orders = await Order.find().populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});;
+        const orders = await Order.find().populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
 
         if (!orders) return next(new ErrorHandler("No order exists", 400));
 
@@ -67,6 +67,33 @@ export const getMyOrders = async(req:Request, res:Response, next:NextFunction) =
         if (!order) return next(new ErrorHandler("Order not found", 404));
 
         return res.status(201).json({success:true, message:order});
+    } catch (error) {
+        console.log(error);
+        return res.status(402).json({success:false, message:error});
+    }
+};
+export const getSingleOrders = async(req:Request, res:Response, next:NextFunction) => {
+    try {
+        const {customerID, orderID} = req.body;
+        console.log({customerID, orderID});
+        
+
+        if (!customerID) return next(new ErrorHandler("Invalid orderID", 400));
+        if (!orderID) return next(new ErrorHandler("Invalid customerID", 400));
+        
+        const order = await Order.findById(customerID).populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
+        if (!order) return next(new ErrorHandler("Order not found", 400));
+        
+        const findResultOrder = order.orderItems.find((order) => order._id?.toString() === orderID);
+        if (!findResultOrder) return next(new ErrorHandler("something wrong in findResultOrder orderController.ts", 400));
+        
+        
+        console.log("&&&&&&&&&&&&&&&&");
+        console.log(findResultOrder);
+        console.log("&&&&&&&&&&&&&&&&");
+        
+        
+        return res.status(200).json({success:true, message:findResultOrder});
     } catch (error) {
         console.log(error);
         return res.status(402).json({success:false, message:error});

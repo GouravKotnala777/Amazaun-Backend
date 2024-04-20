@@ -187,41 +187,6 @@ export const forgetPasswordPre = async(req:Request, res:Response, next:NextFunct
     }
 };
 
-
-
-// export const forgetPassword = async(req:Request, res:Response, next:NextFunction) => {
-//     try {
-//         console.log("@@@@@@@@@@@  (1)");
-        
-//         console.log({tokenFromBody:req.body.token});
-//         console.log("@@@@@@@@@@@  (2)");
-        
-//         const usera = await User.findOne({verifyToken:req.body.token});
-//         console.log("@@@@@@@@@@@  (3)");
-//         console.log({usera:usera?.verifyToken});
-//         console.log("@@@@@@@@@@@  (4)");
-        
-//         if (!usera?.verifyToken) return next(new ErrorHandler("verifyToken is undefined", 404));
-//         console.log("@@@@@@@@@@@  (5)");
-        
-//         const user = await User.findOne({verifyToken:usera?.verifyToken, verifyTokenExpiry:{$gt:Date.now()}});
-//         console.log("@@@@@@@@@@@  (6)");
-        
-//         if (!user) return next(new ErrorHandler("user is undefined", 404));
-//         console.log("@@@@@@@@@@@  (7)");
-        
-//         // console.log({user});
-        
-//         user.forgetPasswordToken = undefined;
-//         user.forgetPasswordTokenExpiry = undefined;
-//         console.log("@@@@@@@@@@@  (8)");
-
-//         await user.save();
-//         return res.status(200).json({success:true, message:"Password has been updated successfully"});
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 export const refreshAccessToken = async(req:Request, res:Response, next:NextFunction) => {
     try {
         const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;

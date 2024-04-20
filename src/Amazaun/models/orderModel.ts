@@ -7,6 +7,7 @@ interface PaymentTypes {
 };
 
 interface OrderItemsSchemaTypes {
+    _id?:string;
     product: string;        
     quantity:number;
     paymentInfo:PaymentTypes;
