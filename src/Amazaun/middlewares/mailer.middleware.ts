@@ -25,6 +25,14 @@ export const sendEmail = async({email, emailType, userID}:{email:string; emailTy
             });
             console.log("--------  (4)");
         }
+        else if (emailType === "REGISTER") {
+            console.log("--------  (3)");
+            await User.findByIdAndUpdate(userID, {
+                verifyToken:await hashedToken,
+                verifyTokenExpiry:Date.now() + 90000
+            });
+            console.log("--------  (4)");
+        }
         else if (emailType === "RESET") {
             const fBI = await User.findByIdAndUpdate(userID, {
                 forgetPasswordToken:await hashedToken,
