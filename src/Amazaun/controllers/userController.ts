@@ -46,17 +46,13 @@ export const createUser = async(req:Request, res:Response, next:NextFunction) =>
     try {        
         const {name, email, password, mobile, role} = req.body;
 
-        console.log("createUser-----  (1)");
         
         
         if (!name || !email || !password || !mobile) return next(new ErrorHandler("All fields are required", 402));
-        console.log("createUser-----  (2)");
         
         const isUserExist = await User.findOne({email});
-        console.log("createUser-----  (3)");
         
         if (isUserExist) return next(new ErrorHandler("User already exists", 402));
-        console.log("createUser-----  (4)");
         
         // console.log({"req.file?.path":req.file?.path});
         // console.log({"req.file":req.file});
@@ -65,36 +61,19 @@ export const createUser = async(req:Request, res:Response, next:NextFunction) =>
         
         if (!req.file?.path) return next(new ErrorHandler("Avatar file not found", 500));
         
-        console.log("createUser-----  (5)");
         const avatar = await uploadOnCloudinary(req.file?.path!, "Avatars");
-        console.log("createUser-----  (6)");
-        
-        // console.log({
-            //     name, email, password, mobile, avatar, role
-            // });
             
         const user = await User.create({
             name, email, password, mobile, avatar:avatar?.secure_url, role
         });
-        console.log("createUser-----  (7)");
         
         const createdUser = await User.findById(user._id).select("-password -refreshToken");
-        console.log("createUser-----  (8)");
         
         if (!createdUser) return next(new ErrorHandler("Something went wrong while registering user", 500));
-        console.log("createUser-----  (9)");
 
-        console.log("###############");
         await sendEmail({email, emailType:"REGISTER", userID:createdUser._id});
-        console.log("###############");
 
         return res.json({success:true, message:"A verification link has sent to your email inbox"});
-        // const {accessToken, refreshToken}:{accessToken:string; refreshToken:string;} = await generateAccessAndRefreshToken(createdUser._id);
-
-        // return res.status(200)
-        //         .cookie("accessToken", accessToken, options)
-        //         .cookie("refreshToken", refreshToken, options)
-        //         .json({success:true, message:"User created successfully"});
     } catch (error) {
         next(error);
     }
@@ -150,32 +129,24 @@ export const verifyEmail = async(req:Request, res:Response, next:NextFunction) =
         let usera;
         let user;
         const {token, emailtype, newPassword} = req.body;
-        console.log("========  (1)");
 
         if (emailtype === "REGISTER") {
-            console.log("***********  (1)");
             
             usera = await User.findOne({verifyToken:token});
-            console.log("***********  (2)");
             
             if (!usera?.verifyToken) return next(new ErrorHandler("verifyToken is undefined", 404));
-            console.log("***********  (3)");
             
             user = await User.findOne({verifyToken:usera?.verifyToken, verifyTokenExpiry:{$gt:Date.now()}});
-            console.log("***********  (4)");
             
             if (!user) return next(new ErrorHandler("user is undefined", 404));
-            console.log("***********  (5)");
             
             
             const {accessToken, refreshToken}:{accessToken:string; refreshToken:string;} = await generateAccessAndRefreshToken(user._id);
-            console.log("***********  (6)");
             
             
             user.isVarified = true;
             user.verifyToken = undefined;
             user.verifyTokenExpiry = undefined;
-            console.log("***********  (7)");
 
             await user?.save();
             return res.status(200)
@@ -228,11 +199,8 @@ export const verifyEmail = async(req:Request, res:Response, next:NextFunction) =
 export const forgetPasswordPre = async(req:Request, res:Response, next:NextFunction) => {
     try {
         const {email} = req.body;
-        console.log("^^^^^^^^  (1)");
         console.log({email});
-        console.log("^^^^^^^^  (2)");
         if (!email) return (next(new ErrorHandler("userID or email not found", 402)));
-        console.log("^^^^^^^^  (3)");
         
         const user = await User.findOne({email});
         if (!user) return (next(new ErrorHandler("User not found", 402)));
@@ -253,19 +221,14 @@ export const refreshAccessToken = async(req:Request, res:Response, next:NextFunc
 
         if (!incomingRefreshToken) return res.status(401).json({success:false, message:"Unauthorized user from refreshAccessToken controller"});
 
-        console.log("---------  (1)");
         
         const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET as Secret) as JwtPayload;
-        console.log("---------  (2)");
         
         const user = await User.findById(decodedToken._id);
-        console.log("---------  (3)");
         
         if (!user) return res.json({success:false, message:"Invalid refresh token from refreshAccessToken controller"});
-        console.log("---------  (4)");
         
         if (incomingRefreshToken !== user.refreshToken) return res.json({success:false, message:"Refresh token is expired or used from refreshAccessToken controller"});
-        console.log("---------  (5)");
 
         const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
 

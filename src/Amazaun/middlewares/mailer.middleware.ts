@@ -122,7 +122,7 @@ export const sendEmail = async({email, emailType, userID}:{email:string; emailTy
                     <h3 class="subject">Subject: ${emailType === "VERIFY" ? "Please Verify Your Email Address" : "Please Verify Your Email To Change Password"}</h3>
                     <div class="receiver">Dear [User's Name],</div>
                     <div class="mail_para">
-                        ${emailType === "VERIFY" ? "Thank you for registering with Amazaun! To ensure the security of your account and access all features, please verify your email address by clicking the link below:" : "To change your password first We need to verify it's you"}
+                        ${emailType === "VERIFY"||emailType === "REGISTER" ? "Thank you for registering with Amazaun! To ensure the security of your account and access all features, please verify your email address by clicking the link below:" : "To change your password first We need to verify it's you"}
                     </div>
                     <div class="verify_link_cont">
                         <a class="verify_btn" href="${process.env.SERVER_URI}/verifyemail?token=${hashedToken}&?emailtype=${emailType}">Verify</a>

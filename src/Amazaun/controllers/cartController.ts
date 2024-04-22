@@ -6,7 +6,6 @@ import { AuthenticatedRequest } from "../middlewares/auth";
 interface CartItemsTypes {
     product: string;
     quantity:number;
-    image:string;
 };
 
 interface CartTypes {
@@ -63,17 +62,18 @@ export const createCartProducts = async(req:Request<{}, {}, CartTypes>, res:Resp
         const {quantity, productID} = req.body;
         // console.log({productID});
         
-        const orderedProduct = {
+        const cartProduct = {
             product:productID,
-            quantity:quantity,
-            image:"image demo"
+            quantity:quantity
         }
         
 
         const isCartProductExist = await Cart.findOne({user:userID});
 
         if (!isCartProductExist) {
-            const order = await Cart.create({user:userID, orderItems:[orderedProduct]});
+            const cart = await Cart.create({user:userID, cartItems:[cartProduct]});
+            console.log({cart});
+            
         }
         else{
             const findResult = isCartProductExist.cartItems.find(q => q.product?.toString() === productID);
@@ -93,7 +93,7 @@ export const createCartProducts = async(req:Request<{}, {}, CartTypes>, res:Resp
             else{
                 console.log("nahi tha");
                 
-                isCartProductExist.cartItems.push(orderedProduct);
+                isCartProductExist.cartItems.push(cartProduct);
                 await isCartProductExist.save();
             }
         }

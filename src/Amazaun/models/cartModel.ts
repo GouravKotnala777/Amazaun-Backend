@@ -4,7 +4,6 @@ import mongoose, { Document, Types } from "mongoose";
 interface CartItemsSchemaTypes {
     product: string;        
     quantity:number;
-    image:string;
 };
 interface PaymentTypes {
     transactionId:string;
