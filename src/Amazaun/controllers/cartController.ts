@@ -133,6 +133,33 @@ export const removeCartProducts = async(req:Request, res:Response, next:NextFunc
         next(error);
     }
 };
+export const clearCartAfterCheckout = async(req:Request, res:Response, next:NextFunction) => {
+    try {
+        const userID = (req as AuthenticatedRequest).user._id;
+        const {checkoutAllData}:{checkoutAllData:CartItemsTypes[]} = req.body;
+
+        if (!userID) return(next(new ErrorHandler("Login First", 402)));
+        if (checkoutAllData.length === 0) return(next(new ErrorHandler("checkoutAllData is undefined or empty array", 402)));
+        
+        console.log({checkoutAllData});
+        
+        const myCart = await Cart.findOne({user:(req as AuthenticatedRequest).user._id});
+        
+        if (!myCart) return(next(new ErrorHandler("Cart Not found", 402)));
+
+        const uniqueProducts = myCart.cartItems.filter(obj1 => !checkoutAllData.some(obj2 => obj2.product === obj1.product.toString()));
+
+        console.log({uniqueProducts});
+        
+        myCart.cartItems = uniqueProducts;
+
+        await myCart.save();
+
+        return res.status(200).json({success:true, message:"Cart has cleared"});
+    } catch (error) {
+        next(error);
+    }
+};
 export const deleteCartProducts = async(req:Request, res:Response, next:NextFunction) => {
     try {
         const {userID, productID} = req.params;

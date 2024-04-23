@@ -7,9 +7,11 @@ interface PaymentTypes {
 };
 
 interface OrderItemsSchemaTypes {
-    _id?:string;
-    product: string;        
-    quantity:number;
+    productGrouped:{
+        _id?:string;
+        product: string;        
+        quantity:number;
+    }[];
     paymentInfo:PaymentTypes;
 };
 interface OrderSchemaTypes extends Document {
@@ -21,13 +23,15 @@ interface OrderSchemaTypes extends Document {
 
 const orderSchema = new mongoose.Schema<OrderSchemaTypes>({
     orderItems:[{
-        product:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Product"
-        },
-        quantity:{
-            type:Number
-        },
+        productGrouped:[{
+            product:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:"Product"
+            },
+            quantity:{
+                type:Number
+            }
+        }],
         paymentInfo:{
             transactionId:String,
             status:{

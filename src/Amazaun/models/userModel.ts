@@ -12,10 +12,10 @@ interface Address {
 };
 
 export interface UserDocument extends Document {
-    name?: string;
-    email?: string;
-    password?: string;
-    mobile?: string;
+    name: string;
+    email: string;
+    password: string;
+    mobile: string;
     avatar?:string;
     role?: string;
     wishlistedProducts?: Types.ObjectId[];

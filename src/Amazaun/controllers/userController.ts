@@ -49,8 +49,11 @@ export const createUser = async(req:Request, res:Response, next:NextFunction) =>
         
         
         if (!name || !email || !password || !mobile) return next(new ErrorHandler("All fields are required", 402));
+        console.log({name, email, password, mobile, role});
         
         const isUserExist = await User.findOne({email});
+        console.log({isUserExist});
+        
         
         if (isUserExist) return next(new ErrorHandler("User already exists", 402));
         
@@ -163,13 +166,18 @@ export const verifyEmail = async(req:Request, res:Response, next:NextFunction) =
             
             if (!user) return next(new ErrorHandler("user is undefined", 404));
 
+            const {accessToken, refreshToken}:{accessToken:string; refreshToken:string;} = await generateAccessAndRefreshToken(user._id);
+            
+            
             user.isVarified = true;
             user.verifyToken = undefined;
             user.verifyTokenExpiry = undefined;
 
             await user?.save();
-    
-            return res.status(200).json({success:true, message:"Email verified successfully"});
+            return res.status(200)
+                .cookie("accessToken", accessToken, options)
+                .cookie("refreshToken", refreshToken, options)
+                .json({success:true, message:"Email verified successfully"});
         }
         else if (emailtype === "RESET") {
             usera = await User.findOne({forgetPasswordToken:token});

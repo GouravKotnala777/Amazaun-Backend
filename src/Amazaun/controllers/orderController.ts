@@ -3,6 +3,10 @@ import Order from "../models/orderModel";
 import ErrorHandler from "../utils/utility-class";
 import { AuthenticatedRequest } from "../middlewares/auth";
 
+interface CheckoutAllDataTypes {
+    product:string;
+    quantity:number;
+}
 
 export const getAllOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
@@ -19,35 +23,47 @@ export const getAllOrders = async(req:Request, res:Response, next:NextFunction) 
 export const createOrder = async(req:Request, res:Response, next:NextFunction) => {
     try {
         const userID = (req as AuthenticatedRequest)?.user?._id;
-        const {quantity, productID, status, message} = req.body;
+        const {checkoutAllData, status, message}:{checkoutAllData:CheckoutAllDataTypes[]; status?:string; message?:string;} = req.body;
 
         const isUserOrderExists = await Order.findOne({user:userID});
 
+        console.log("YYYYYYYYYYYYYYYYY");
+        console.log({checkoutAllData});
+        console.log("YYYYYYYYYYYYYYYYY");
+        
         if (isUserOrderExists) {
-            isUserOrderExists.orderItems.push({
-                product:productID,
-                quantity:quantity,
-                paymentInfo:{
-                    transactionId:"Demo Transaction ID",
-                    status:status,
-                    message:message
-                }
-            });
+            checkoutAllData.forEach((item) => {
+                isUserOrderExists.orderItems.push({
+                    productGrouped:[{
+                        product:item.product,
+                        quantity:item.quantity,
+                    }],
+                    paymentInfo:{
+                        transactionId:"Demo Transaction ID",
+                        status:status,
+                        message:message
+                    }
+                });
+            })
 
             await isUserOrderExists.save();
         }
         else{
+            // checkoutAllData.forEach(async(item) => {
             const newOrder = await Order.create({
-                orderItems:[{
-                    product:productID,
-                    quantity:quantity,
-                    paymentInfo:{
-                        transactionId:"Demo Transaction ID",
-                        status:status
-                    }
-                }],
-                user:userID,
-            });
+                    orderItems:[{
+                        productGrouped:[
+                            ...checkoutAllData
+                        ],
+                        paymentInfo:{
+                            transactionId:"Demo Transaction ID",
+                            status:status,
+                            message:message
+                        }
+                    }],
+                    user:userID,
+                });
+            // });
         }
         
         
@@ -62,7 +78,7 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
 };
 export const getMyOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const order = await Order.findOne({user:(req as AuthenticatedRequest).user._id}).populate({model:"Product", path:"orderItems.product", select:"name price photo"});
+        const order = await Order.findOne({user:(req as AuthenticatedRequest).user._id}).populate({model:"Product", path:"orderItems.productGrouped.product", select:"name price photo"});
 
         if (!order) return next(new ErrorHandler("Order not found", 404));
 
@@ -72,33 +88,33 @@ export const getMyOrders = async(req:Request, res:Response, next:NextFunction) =
         return res.status(402).json({success:false, message:error});
     }
 };
-export const getSingleOrders = async(req:Request, res:Response, next:NextFunction) => {
-    try {
-        const {customerID, orderID} = req.body;
-        console.log({customerID, orderID});
+// export const getSingleOrders = async(req:Request, res:Response, next:NextFunction) => {
+//     try {
+//         const {customerID, orderID} = req.body;
+//         console.log({customerID, orderID});
         
 
-        if (!customerID) return next(new ErrorHandler("Invalid orderID", 400));
-        if (!orderID) return next(new ErrorHandler("Invalid customerID", 400));
+//         if (!customerID) return next(new ErrorHandler("Invalid orderID", 400));
+//         if (!orderID) return next(new ErrorHandler("Invalid customerID", 400));
         
-        const order = await Order.findById(customerID).populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
-        if (!order) return next(new ErrorHandler("Order not found", 400));
+//         const order = await Order.findById(customerID).populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
+//         if (!order) return next(new ErrorHandler("Order not found", 400));
         
-        const findResultOrder = order.orderItems.find((order) => order._id?.toString() === orderID);
-        if (!findResultOrder) return next(new ErrorHandler("something wrong in findResultOrder orderController.ts", 400));
-        
-        
-        console.log("&&&&&&&&&&&&&&&&");
-        console.log(findResultOrder);
-        console.log("&&&&&&&&&&&&&&&&");
+//         const findResultOrder = order.orderItems.find((order) => order._id?.toString() === orderID);
+//         if (!findResultOrder) return next(new ErrorHandler("something wrong in findResultOrder orderController.ts", 400));
         
         
-        return res.status(200).json({success:true, message:findResultOrder});
-    } catch (error) {
-        console.log(error);
-        return res.status(402).json({success:false, message:error});
-    }
-};
+//         console.log("&&&&&&&&&&&&&&&&");
+//         console.log(findResultOrder);
+//         console.log("&&&&&&&&&&&&&&&&");
+        
+        
+//         return res.status(200).json({success:true, message:findResultOrder});
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(402).json({success:false, message:error});
+//     }
+// };
 
 
 

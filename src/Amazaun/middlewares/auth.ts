@@ -11,8 +11,8 @@ export const isUserAuthenticated = async(req:Request, res:Response, next:NextFun
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
     
-        console.log({accessToken:req.cookies?.accessToken});
-        console.log({accessTokenH:req.header("Authorization")?.replace("Bearer ", "")});
+        // console.log({accessToken:req.cookies?.accessToken});
+        // console.log({accessTokenH:req.header("Authorization")?.replace("Bearer ", "")});
         
         if (!token) return next(new ErrorHandler("Unauthorized request", 401));
         
