@@ -10,8 +10,10 @@ interface CheckoutAllDataTypes {
 
 export const getAllOrders = async(req:Request, res:Response, next:NextFunction) => {
     try {
-        const orders = await Order.find().populate({model:"Product", path:"orderItems.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
+        const orders = await Order.find().populate({model:"Product", path:"orderItems.productGrouped.product", select:"name price photo"}).populate({model:"User", path:"user", select:"name email"});
 
+        console.log({orders});
+        
         if (!orders) return next(new ErrorHandler("No order exists", 400));
 
         return res.status(201).json({success:true, message:orders});
@@ -27,9 +29,9 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
 
         const isUserOrderExists = await Order.findOne({user:userID});
 
-        console.log("YYYYYYYYYYYYYYYYY");
-        console.log({checkoutAllData});
-        console.log("YYYYYYYYYYYYYYYYY");
+        // console.log("YYYYYYYYYYYYYYYYY");
+        // console.log({checkoutAllData});
+        // console.log("YYYYYYYYYYYYYYYYY");
         
         if (isUserOrderExists) {
             checkoutAllData.forEach((item) => {
