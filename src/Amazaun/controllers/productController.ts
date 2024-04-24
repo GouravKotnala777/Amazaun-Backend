@@ -40,21 +40,15 @@ export const createProduct = async(req:Request<{}, {}, CreateProductBodyTypes>, 
         next(error);
     }
 };
-export const getAllProducts = async(req:Request, res:Response, next:NextFunction) => {
+export const getAllProducts = async(req:Request<{}, {}, {productType:string|undefined; name:string|undefined;}, {skipProducts:number}>, res:Response, next:NextFunction) => {
     try {
-        
-        const products = await Product.find();
 
-        if (products.length === 0) return next(new ErrorHandler("No product exists", 400));
+        const {skipProducts} = req.query;
+        const {productType, name} = req.body;
 
-        res.status(200).json({success:true, message:products});
-    } catch (error) {
-        next(error);
-    }
-};
-export const getAllProductsWithSearchedQueries = async(req:Request, res:Response, next:NextFunction) => {
-    try {
-        const {productType, name}:{productType:string|undefined; name:string|undefined;} = req.body;
+        console.log({skipProducts});
+
+
         const products = await Product.find({
             productType:{
                 $regex:productType?productType:"",
@@ -64,12 +58,12 @@ export const getAllProductsWithSearchedQueries = async(req:Request, res:Response
                 $regex:name?name:"",
                 $options:"i"
             }
-        });
-        // const aa:Promise<string | APIFeaturesTypes[]> = apiFeatures(Product, queryStr);
+        }).skip(skipProducts*6).limit(6);
+        
+        // const products = await Product.find().skip(skipProducts*6).limit(6);
 
         if (products.length === 0) return next(new ErrorHandler("No product exists", 400));
-
-        // console.log({aa:await aa});
+        console.log(products);
         
 
         res.status(200).json({success:true, message:products});
