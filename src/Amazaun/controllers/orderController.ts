@@ -34,19 +34,18 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
         // console.log("YYYYYYYYYYYYYYYYY");
         
         if (isUserOrderExists) {
-            checkoutAllData.forEach((item) => {
+            // checkoutAllData.forEach((item) => {
                 isUserOrderExists.orderItems.push({
-                    productGrouped:[{
-                        product:item.product,
-                        quantity:item.quantity,
-                    }],
+                    productGrouped:[
+                        ...checkoutAllData
+                    ],
                     paymentInfo:{
                         transactionId:"Demo Transaction ID",
                         status:status,
                         message:message
                     }
                 });
-            })
+            // })
 
             await isUserOrderExists.save();
         }

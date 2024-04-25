@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/utility-class";
 import { AuthenticatedRequest } from "../middlewares/auth";
 import { uploadOnCloudinary } from "../utils/cloudinary.util";
 import apiFeatures, { APIFeaturesTypes } from "../utils/api-features";
+import User from "../models/userModel";
 
 interface CreateProductBodyTypes {
     productType:string;
@@ -180,29 +181,55 @@ export const addToWishlist = async(req:Request, res:Response, next:NextFunction)
         if (!productID) return next(new ErrorHandler("ProductID not found", 404));
         
         const product = await Product.findById(productID);
-        
+
         if (!product) return next(new ErrorHandler("Product not found", 404));
 
+        const user = await User.findById((req as AuthenticatedRequest).user._id);
+
+        if (!user) return next(new ErrorHandler("Login first", 404));
+
+        // console.log({user:user?.wishlistedProducts});
+        
+
         const wishlistedUserFindResult = product.wishlistedUsers.find(user => user.toString() === (req as AuthenticatedRequest).user._id.toString());
+
         
         if (wishlistedUserFindResult) {
             const wishlistedUserFilterResult = product.wishlistedUsers.filter(user => user.toString() !== (req as AuthenticatedRequest).user._id.toString());
+            const wishlistedProductsFilterResult = user.wishlistedProducts?.filter(product => product.toString() !== productID.toString());
             
             product.wishlistedUsers = wishlistedUserFilterResult;
+            user.wishlistedProducts = wishlistedProductsFilterResult;
+            await product.save();
+            await user.save();
+            
+            return res.status(201).json({success:true, message:product, message2:"Removed from wishlist"});
         }
         else{
             product.wishlistedUsers.push((req as AuthenticatedRequest).user._id);
+            user.wishlistedProducts?.push(productID);
+            await product.save();
+            await user.save();
+            
+            return res.status(201).json({success:true, message:product, message2:"Added to wishlist"});
         }
 
-        await product.save();
-        
-        return res.status(201).json({success:true, message:product});
     } catch (error) {
         console.log(error);
         next(error);
     }
 };
+export const findMyWishlist = async(req:Request, res:Response, next:NextFunction) => {
+    try {
+        const user = await User.findById((req as AuthenticatedRequest).user._id).populate({model:"Product", path:"wishlistedProducts", select:"name price photo "});
 
+        if (!user) return next(new ErrorHandler("user not found", 404));
+
+        return res.status(201).json({success:true, message:user.wishlistedProducts});
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 
