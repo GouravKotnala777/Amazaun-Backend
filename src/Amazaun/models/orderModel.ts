@@ -2,6 +2,9 @@ import mongoose, { Types } from "mongoose";
 
 interface PaymentTypes {
     transactionId:string;
+    shippingType:string;
+    subTotal:number;
+    total:number;
     status?:string;
     message?:string;
 };
@@ -34,6 +37,19 @@ const orderSchema = new mongoose.Schema<OrderSchemaTypes>({
         }],
         paymentInfo:{
             transactionId:String,
+            shippingType:{
+                type:String,
+                enum:["instant", "standard", "regular"],
+                required:true
+            },
+            subTotal:{
+                type:Number,
+                required:true
+            },
+            total:{
+                type:Number,
+                required:true
+            },
             status:{
                 type:String,
                 default:"Pending"

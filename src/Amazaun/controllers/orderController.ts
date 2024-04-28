@@ -25,13 +25,13 @@ export const getAllOrders = async(req:Request, res:Response, next:NextFunction) 
 export const createOrder = async(req:Request, res:Response, next:NextFunction) => {
     try {
         const userID = (req as AuthenticatedRequest)?.user?._id;
-        const {checkoutAllData, status, message}:{checkoutAllData:CheckoutAllDataTypes[]; status?:string; message?:string;} = req.body;
+        const {checkoutAllData, shippingType, subTotal, total, status, message}:{checkoutAllData:CheckoutAllDataTypes[]; shippingType:string; subTotal:number; total:number; status?:string; message?:string;} = req.body;
 
         const isUserOrderExists = await Order.findOne({user:userID});
 
-        // console.log("YYYYYYYYYYYYYYYYY");
-        // console.log({checkoutAllData});
-        // console.log("YYYYYYYYYYYYYYYYY");
+        console.log("YYYYYYYYYYYYYYYYY");
+        console.log({checkoutAllData, shippingType, status, message});
+        console.log("YYYYYYYYYYYYYYYYY");
         
         if (isUserOrderExists) {
             // checkoutAllData.forEach((item) => {
@@ -41,8 +41,11 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
                     ],
                     paymentInfo:{
                         transactionId:"Demo Transaction ID",
-                        status:status,
-                        message:message
+                        shippingType,
+                        subTotal,
+                        total,
+                        status,
+                        message
                     }
                 });
             // })
@@ -58,6 +61,9 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
                         ],
                         paymentInfo:{
                             transactionId:"Demo Transaction ID",
+                            shippingType,
+                            subTotal,
+                            total,
                             status:status,
                             message:message
                         }
