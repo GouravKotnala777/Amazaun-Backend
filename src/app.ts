@@ -12,6 +12,7 @@ import { errorMiddleware } from "./Amazaun/middlewares/errorMiddleware";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser"
 import Stripe from "stripe";
+import categoryRoute from "./Amazaun/routes/productCategoryRouter";
 // import Stripe from "stripe";
 
 
@@ -47,6 +48,7 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use("/api/v1/order", orderRoute);
+app.use("/api/v1/category", categoryRoute);
 app.get("/api/v1/test", (req, res) => {
     res.status(200).json({success:true, message:"API is working"})
 })

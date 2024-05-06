@@ -2,7 +2,8 @@ import { Document, Model, Schema } from "mongoose";
 import { ProductModelTypes } from "../models/productModel";
 
 export interface APIFeaturesTypes extends Document {
-    productType:string;
+    category:string;
+    brand:string;
     name:string;
     price:number;
     ratings:number;

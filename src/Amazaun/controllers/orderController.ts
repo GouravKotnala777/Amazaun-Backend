@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Order from "../models/orderModel";
 import ErrorHandler from "../utils/utility-class";
 import { AuthenticatedRequest } from "../middlewares/auth";
+import Product from "../models/productModel";
 
 interface CheckoutAllDataTypes {
     product:string;
@@ -28,11 +29,23 @@ export const createOrder = async(req:Request, res:Response, next:NextFunction) =
         const {checkoutAllData, shippingType, subTotal, total, status, message}:{checkoutAllData:CheckoutAllDataTypes[]; shippingType:string; subTotal:number; total:number; status?:string; message?:string;} = req.body;
 
         const isUserOrderExists = await Order.findOne({user:userID});
-
-        console.log("YYYYYYYYYYYYYYYYY");
-        console.log({checkoutAllData, shippingType, status, message});
-        console.log("YYYYYYYYYYYYYYYYY");
         
+
+        // console.log("YYYYYYYYYYYYYYYYY");
+        // console.log({checkoutAllData, shippingType, status, message});
+        // console.log("YYYYYYYYYYYYYYYYY");
+        
+
+
+        if (status !== "Failed") {
+            checkoutAllData.forEach(async(item, index) => {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    await product.save();
+                }
+            });
+        }
+
         if (isUserOrderExists) {
             // checkoutAllData.forEach((item) => {
                 isUserOrderExists.orderItems.push({

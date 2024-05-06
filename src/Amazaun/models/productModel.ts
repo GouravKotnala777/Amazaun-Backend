@@ -3,9 +3,39 @@ import mongoose, { Document, Schema } from "mongoose";
 
 
 export interface ProductModelTypes extends Document {
-    productType:string;
+    category:string;
+    brand:string;
     name:string;
     price:number;
+    
+
+
+    
+    allergen:string;
+    promotional:{
+        discount:number;
+        specialOffer:{offerName:string; offerAmount:number;}
+    };
+    shippingCriteria:{
+        weight:number;
+        dimension:{
+            length:number;
+            width:number;
+            height:number;
+        };
+        restriction:string;
+    };
+    salesHistory:{
+        unitSold:number;
+        Revenue:number;
+    };
+    description:string;
+    flavor?:string;
+
+
+
+
+
     ratings:number;
     stock:number;
     numOfReviews:number;
@@ -20,10 +50,44 @@ export interface ProductModelTypes extends Document {
 }
 
 const productSchema = new mongoose.Schema<ProductModelTypes>({
-    productType:String,
+    category:String,
+    brand:String,
     name:String,
     price:Number,
-    ratings:Number,
+
+
+    allergen:String,
+    promotional:{
+        discount:Number,
+        specialOffer:{offerName:String, offerAmount:Number}
+    },
+    shippingCriteria:{
+        weight:Number,
+        dimension:{
+            length:Number,
+            width:Number,
+            height:Number
+        },
+        restriction:{
+            type:String,
+            enum:[undefined, "temperature specific", "brittle material", "over weight", "over volume"]
+        }
+    },
+    salesHistory:{
+        unitSold:{type:Number, default:0, required:true},
+        Revenue:Number
+    },
+    description:String,
+    flavor:{
+        type:String
+    },
+
+
+
+    ratings:{
+        type:Number,
+        default:0
+    },
     stock:Number,
     numOfReviews:Number,
     photo:String, 
